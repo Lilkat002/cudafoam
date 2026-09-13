@@ -1,7 +1,18 @@
 # cudaFoam
 
+[![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
+[![OpenFOAM 12](https://img.shields.io/badge/OpenFOAM-12-darkgreen.svg)](https://openfoam.org)
+[![CUDA 12/13](https://img.shields.io/badge/CUDA-12%20%7C%2013-76B900.svg)](https://developer.nvidia.com/cuda-toolkit)
+
 Native NVIDIA GPU acceleration for OpenFOAM's pressure solver — a drop-in
 `lduMatrix` solver plugin, no changes to OpenFOAM itself.
+
+**[How it works](#how-it-works)** ·
+**[Build](#build)** ·
+**[Use](#use)** ·
+**[Benchmarks](#benchmarks)** ·
+**[Limitations](#limitations)** ·
+**[Roadmap](#roadmap)**
 
 On a single A10G (AWS g5.xlarge), the GPU solver is faster than **every** CPU
 option in stock OpenFOAM 12, including GAMG, at identical tolerances:
