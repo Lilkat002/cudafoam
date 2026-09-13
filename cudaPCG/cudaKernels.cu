@@ -23,8 +23,11 @@
 //    breakdown sets alpha=0 on device (update becomes a no-op) and raises
 //    the flag, matching OpenFOAM's pre-update singularity exit.
 //
-// Coupled (processor/cyclic) boundary contributions are not applied here —
-// this solver targets single-GPU, non-decomposed runs.
+// Cyclic (periodic) boundary coupling is supported: the caller passes the
+// couplings as extra COO entries (row, col, value) which are folded into the
+// CSR structure — the coloring is built from the CSR, so the preconditioner
+// respects periodicity automatically. Processor (MPI) interfaces are not
+// handled here; the caller falls back to the CPU solver for those.
 
 #include <cuda_runtime.h>
 #include <cusparse.h>
@@ -250,7 +253,7 @@ __global__ void k_f2d(int n, const float* a, double* out)
 
 struct Ctx
 {
-    int nCells = -1, nFaces = -1, nnz = 0;
+    int nCells = -1, nFaces = -1, nExtra = 0, nnz = 0;
     bool fp32Precond = true;
 
     // CSR structure (constant while addressing is constant)
@@ -263,7 +266,7 @@ struct Ctx
     std::vector<int> colorPtr;              // host: [nColors+1] into d_cells
     int *d_cells = nullptr, *d_color = nullptr;
 
-    // staging: [diag | upper | lower]
+    // staging: [diag | upper | lower | cyclic extras]
     double* d_src = nullptr;
 
     // work vectors
@@ -312,13 +315,18 @@ void freeCtx()
 }
 
 // Build the CSR structure and the greedy graph coloring on the host.
-// CSR value k gathers from [diag(0..n) | upper(n..n+nF) | lower(n+nF..)].
-void setup(int nCells, int nFaces, const int* uAddr, const int* lAddr)
+// CSR value k gathers from
+// [diag(0..n) | upper(n..n+nF) | lower(n+nF..n+2nF) | extras(n+2nF..)].
+// Extras are cyclic (periodic) couplings handed over as COO entries; they
+// participate in the coloring like any other off-diagonal, so the GS
+// preconditioner respects periodicity.
+void setup(int nCells, int nFaces, const int* uAddr, const int* lAddr,
+           int nExtra, const int* eRow, const int* eCol)
 {
     freeCtx();
 
     const int n = nCells;
-    const int nnz = nCells + 2 * nFaces;
+    const int nnz = nCells + 2 * nFaces + nExtra;
 
     const char* env = getenv("CUDAPCG_FP64_PRECOND");
     ctx.fp32Precond = !(env && env[0] == '1');
@@ -329,6 +337,7 @@ void setup(int nCells, int nFaces, const int* uAddr, const int* lAddr)
         rowCount[lAddr[f]]++;
         rowCount[uAddr[f]]++;
     }
+    for (int e = 0; e < nExtra; ++e) rowCount[eRow[e]]++;
     std::vector<int> rowPtr(n + 1, 0);
     for (int i = 0; i < n; ++i) rowPtr[i + 1] = rowPtr[i] + rowCount[i];
 
@@ -344,6 +353,10 @@ void setup(int nCells, int nFaces, const int* uAddr, const int* lAddr)
     {
         put(lAddr[f], uAddr[f], nCells + f);          // upper coeff
         put(uAddr[f], lAddr[f], nCells + nFaces + f); // lower coeff
+    }
+    for (int e = 0; e < nExtra; ++e)
+    {
+        put(eRow[e], eCol[e], nCells + 2 * nFaces + e);
     }
     for (int i = 0; i < n; ++i)
     {
@@ -396,6 +409,7 @@ void setup(int nCells, int nFaces, const int* uAddr, const int* lAddr)
 
     ctx.nCells = nCells;
     ctx.nFaces = nFaces;
+    ctx.nExtra = nExtra;
     ctx.nnz = nnz;
     ctx.nColors = nColors;
 
@@ -461,8 +475,10 @@ void setup(int nCells, int nFaces, const int* uAddr, const int* lAddr)
         ctx.vY, CUDA_R_64F, CUSPARSE_SPMV_ALG_DEFAULT, &s3));
     CUDA_CHECK(cudaMalloc(&ctx.d_bufMV, std::max({s1, s2, s3, size_t(8)})));
 
-    printf("cudaPCG: %d cells, %d faces, %d colors, %s preconditioner\n",
-           nCells, nFaces, nColors, ctx.fp32Precond ? "FP32" : "FP64");
+    printf("cudaPCG: %d cells, %d faces, %d cyclic couplings, %d colors, "
+           "%s preconditioner\n",
+           nCells, nFaces, nExtra, nColors,
+           ctx.fp32Precond ? "FP32" : "FP64");
 }
 
 void spmv(cusparseDnVecDescr_t x, cusparseDnVecDescr_t y)
@@ -544,21 +560,25 @@ extern "C" void cudaPCG_solve(
     int nCells, int nFaces,
     const double* h_diag, const double* h_upper, const double* h_lower,
     const int* h_upperAddr, const int* h_lowerAddr,
+    int nExtra, const int* h_extraRow, const int* h_extraCol,
+    const double* h_extraVal,
     const double* h_source,
     double* h_psi,
     double tolerance, double relTol,
     int minIter, int maxIter,
     int* nIterationsOut, double* initialResidualOut, double* finalResidualOut)
 {
-    if (nCells != ctx.nCells || nFaces != ctx.nFaces)
+    if (nCells != ctx.nCells || nFaces != ctx.nFaces
+     || nExtra != ctx.nExtra)
     {
-        setup(nCells, nFaces, h_upperAddr, h_lowerAddr);
+        setup(nCells, nFaces, h_upperAddr, h_lowerAddr,
+              nExtra, h_extraRow, h_extraCol);
     }
 
     const int n = nCells;
     cudaStream_t st = ctx.stream;
 
-    // stage [diag | upper | lower], gather into CSR value order
+    // stage [diag | upper | lower | extras], gather into CSR value order
     CUDA_CHECK(cudaMemcpyAsync(ctx.d_src, h_diag, n * sizeof(double),
                                cudaMemcpyHostToDevice, st));
     CUDA_CHECK(cudaMemcpyAsync(ctx.d_src + n, h_upper,
@@ -567,6 +587,12 @@ extern "C" void cudaPCG_solve(
     CUDA_CHECK(cudaMemcpyAsync(ctx.d_src + n + nFaces, h_lower,
                                nFaces * sizeof(double),
                                cudaMemcpyHostToDevice, st));
+    if (nExtra > 0)
+    {
+        CUDA_CHECK(cudaMemcpyAsync(ctx.d_src + n + 2 * nFaces, h_extraVal,
+                                   nExtra * sizeof(double),
+                                   cudaMemcpyHostToDevice, st));
+    }
     k_gather<<<nb(ctx.nnz), BS, 0, st>>>(ctx.nnz, ctx.d_src, ctx.d_perm,
                                          ctx.d_valA, ctx.d_valAf);
 

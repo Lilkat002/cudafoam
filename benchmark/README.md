@@ -51,6 +51,18 @@ foamRun
 The small-mesh benchmark is simply the unmodified tutorial (12,225 cells,
 `endTime 0.1`, 1000 steps) with the solver switched as above.
 
+## Cyclic (periodic) boundary validation
+
+`results/cyclic_channel395_{cpu,gpu,gamg}.log` are runs of the OpenFOAM 12
+`incompressibleFluid/channel395` tutorial (60,000 cells, cyclic patches in
+two directions, `endTime 5` = 25 steps) with p/pFinal switched to
+PCG-DIC / cudaPCG / GAMG respectively. The first pressure solve's initial
+residual matches between CPU and GPU to all printed digits (0.194502) —
+that residual is computed through the full matrix, so it directly verifies
+the cyclic coupling entries. Final pressure fields: GPU-vs-PCG 0.25% of
+field range, GAMG-vs-PCG 0.21% — i.e. within solver-to-solver scatter at
+the case's tolerances.
+
 Compare wall time via the final `ExecutionTime` line, and validate
 correctness by diffing the written pressure fields between the CPU and GPU
 runs at the same output time (they should agree to a small fraction of the

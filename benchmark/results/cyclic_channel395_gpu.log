@@ -1,0 +1,502 @@
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  12
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+Build  : 12-86e126a7bc4d
+Exec   : foamRun
+Date   : Sep 13 2026
+Time   : 21:26:26
+Host   : "ip-172-31-29-158"
+PID    : 8384
+I/O    : uncollated
+Case   : /home/ubuntu/chan_gpu
+nProcs : 1
+sigFpe : Enabling floating point exception trapping (FOAM_SIGFPE).
+fileModificationChecking : Monitoring run-time modified files using timeStampMaster (fileModificationSkew 10)
+allowSystemOperations : Allowing user-supplied system call operations
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+Create time
+
+Create mesh for time = 0
+
+Selecting solver incompressibleFluid
+Selecting viscosity model constant
+Selecting turbulence model type LES
+Selecting LES turbulence model WALE
+Selecting LES delta type cubeRootVol
+LES
+{
+    model           WALE;
+    turbulence      on;
+    printCoeffs     on;
+    delta           cubeRootVol;
+    cubeRootVolCoeffs
+    {
+        deltaCoeff      1;
+    }
+    PrandtlCoeffs
+    {
+        delta           cubeRootVol;
+        cubeRootVolCoeffs
+        {
+            deltaCoeff      1;
+        }
+        smoothCoeffs
+        {
+            delta           cubeRootVol;
+            cubeRootVolCoeffs
+            {
+                deltaCoeff      1;
+            }
+            maxDeltaRatio   1.1;
+        }
+        Cdelta          0.158;
+    }
+    vanDriestCoeffs
+    {
+        delta           cubeRootVol;
+        cubeRootVolCoeffs
+        {
+            deltaCoeff      1;
+        }
+        smoothCoeffs
+        {
+            delta           cubeRootVol;
+            cubeRootVolCoeffs
+            {
+                deltaCoeff      1;
+            }
+            maxDeltaRatio   1.1;
+        }
+        Aplus           26;
+        Cdelta          0.158;
+    }
+    smoothCoeffs
+    {
+        delta           cubeRootVol;
+        cubeRootVolCoeffs
+        {
+            deltaCoeff      1;
+        }
+        maxDeltaRatio   1.1;
+    }
+    Ck              0.094;
+    Ce              1.048;
+    Cw              0.325;
+}
+
+No MRF models present
+
+Creating fvConstraints from "system/fvConstraints"
+
+Selecting finite volume constraint type meanVelocityForce
+    Name: momentumForce
+    - selecting all cells
+    - selected 60000 cell(s) with volume 16
+    Initial pressure gradient = 0
+
+Courant Number mean: 0.302759 max: 0.526366
+
+PIMPLE: No convergence criteria found
+
+
+PIMPLE: Operating solver in transient mode with 1 outer corrector
+PIMPLE: Operating solver in PISO mode
+
+
+
+Starting time loop
+
+layerAverage layerAverage:
+    Detected 50 layers
+
+--> FOAM Warning :     functionObjects::mag mag(UPrime2Mean) cannot find required object UPrime2Mean
+--> FOAM Warning :     functionObjects::mag mag(UPrime2Mean) failed to execute.
+--> FOAM Warning : functionObjects::multiply multiply(half,mag(UPrime2Mean),result=k) cannot find fields 1(mag(UPrime2Mean))
+--> FOAM Warning :     functionObjects::layerAverage layerAverage cannot find required object pMean
+--> FOAM Warning :     functionObjects::layerAverage layerAverage cannot find required object pPrime2Mean
+--> FOAM Warning :     functionObjects::layerAverage layerAverage cannot find required object UMean
+--> FOAM Warning :     functionObjects::layerAverage layerAverage cannot find required object UPrime2Mean
+--> FOAM Warning :     functionObjects::layerAverage layerAverage cannot find required object k
+Courant Number mean: 0.302759 max: 0.526366
+Time = 0.2s
+
+smoothSolver:  Solving for Ux, Initial residual = 0.0115346, Final residual = 1.80208e-06, No Iterations 3
+smoothSolver:  Solving for Uy, Initial residual = 0.0617339, Final residual = 1.68005e-06, No Iterations 4
+smoothSolver:  Solving for Uz, Initial residual = 0.0589522, Final residual = 9.65879e-06, No Iterations 3
+Pressure gradient source: uncorrected Ubar = 0.133689, pressure gradient = -0.000956461
+cudaPCG: 60000 cells, 175300 faces, 7000 cyclic couplings, 2 colors, FP32 preconditioner
+cudaPCG:  Solving for p, Initial residual = 0.194502, Final residual = 0.0178067, No Iterations 5
+time step continuity errors : sum local = 2.4475e-05, global = -1.84526e-19
+Pressure gradient source: uncorrected Ubar = 0.133686, pressure gradient = -0.000944477
+cudaPCG:  Solving for p, Initial residual = 0.0293259, Final residual = 9.68552e-07, No Iterations 185
+time step continuity errors : sum local = 1.18782e-09, global = -1.41097e-19, cumulative = -1.41097e-19
+Pressure gradient source: uncorrected Ubar = 0.133686, pressure gradient = -0.000944443
+ExecutionTime = 0.844416 s  ClockTime = 4 s
+
+Courant Number mean: 0.302514 max: 0.522145
+Time = 0.4s
+
+smoothSolver:  Solving for Ux, Initial residual = 0.0117431, Final residual = 6.07922e-06, No Iterations 2
+smoothSolver:  Solving for Uy, Initial residual = 0.0612537, Final residual = 3.50895e-06, No Iterations 3
+smoothSolver:  Solving for Uz, Initial residual = 0.0583841, Final residual = 2.68897e-06, No Iterations 3
+Pressure gradient source: uncorrected Ubar = 0.133306, pressure gradient = 0.000525114
+cudaPCG:  Solving for p, Initial residual = 0.501469, Final residual = 0.0417083, No Iterations 5
+time step continuity errors : sum local = 2.80367e-05, global = -4.77316e-20
+Pressure gradient source: uncorrected Ubar = 0.133308, pressure gradient = 0.000512222
+cudaPCG:  Solving for p, Initial residual = 0.0645196, Final residual = 9.05341e-07, No Iterations 199
+time step continuity errors : sum local = 4.77799e-10, global = -1.02945e-19, cumulative = -2.44042e-19
+Pressure gradient source: uncorrected Ubar = 0.133308, pressure gradient = 0.000512059
+ExecutionTime = 0.951946 s  ClockTime = 4 s
+
+Courant Number mean: 0.302212 max: 0.514046
+Time = 0.6s
+
+smoothSolver:  Solving for Ux, Initial residual = 0.0111793, Final residual = 5.79045e-06, No Iterations 2
+smoothSolver:  Solving for Uy, Initial residual = 0.0608925, Final residual = 3.45373e-06, No Iterations 3
+smoothSolver:  Solving for Uz, Initial residual = 0.0581285, Final residual = 2.70603e-06, No Iterations 3
+Pressure gradient source: uncorrected Ubar = 0.133565, pressure gradient = 2.24566e-05
+cudaPCG:  Solving for p, Initial residual = 0.222655, Final residual = 0.0180171, No Iterations 5
+time step continuity errors : sum local = 1.00153e-05, global = -1.39899e-20
+Pressure gradient source: uncorrected Ubar = 0.133564, pressure gradient = 2.66451e-05
+cudaPCG:  Solving for p, Initial residual = 0.0222493, Final residual = 8.83903e-07, No Iterations 186
+time step continuity errors : sum local = 5.16789e-10, global = -9.69109e-20, cumulative = -3.40953e-19
+Pressure gradient source: uncorrected Ubar = 0.133564, pressure gradient = 2.66268e-05
+ExecutionTime = 1.04881 s  ClockTime = 4 s
+
+Courant Number mean: 0.302265 max: 0.511416
+Time = 0.8s
+
+smoothSolver:  Solving for Ux, Initial residual = 0.0111945, Final residual = 5.86469e-06, No Iterations 2
+smoothSolver:  Solving for Uy, Initial residual = 0.0606562, Final residual = 3.36949e-06, No Iterations 3
+smoothSolver:  Solving for Uz, Initial residual = 0.0579142, Final residual = 2.72098e-06, No Iterations 3
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.68147e-05
+cudaPCG:  Solving for p, Initial residual = 0.133276, Final residual = 0.012531, No Iterations 5
+time step continuity errors : sum local = 7.50156e-06, global = -1.71081e-19
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.67251e-05
+cudaPCG:  Solving for p, Initial residual = 0.018227, Final residual = 9.86499e-07, No Iterations 169
+time step continuity errors : sum local = 6.07699e-10, global = -2.044e-19, cumulative = -5.45353e-19
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.66671e-05
+ExecutionTime = 1.14546 s  ClockTime = 4 s
+
+Courant Number mean: 0.302293 max: 0.52248
+Time = 1s
+
+smoothSolver:  Solving for Ux, Initial residual = 0.011205, Final residual = 5.91482e-06, No Iterations 2
+smoothSolver:  Solving for Uy, Initial residual = 0.0605291, Final residual = 3.26239e-06, No Iterations 3
+smoothSolver:  Solving for Uz, Initial residual = 0.0578719, Final residual = 2.74894e-06, No Iterations 3
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.68585e-05
+cudaPCG:  Solving for p, Initial residual = 0.136553, Final residual = 0.0120274, No Iterations 5
+time step continuity errors : sum local = 7.61288e-06, global = -4.17976e-20
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.67673e-05
+cudaPCG:  Solving for p, Initial residual = 0.0179361, Final residual = 9.05592e-07, No Iterations 169
+time step continuity errors : sum local = 5.89936e-10, global = -1.04731e-19, cumulative = -6.50084e-19
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.67079e-05
+ExecutionTime = 1.24267 s  ClockTime = 5 s
+
+Courant Number mean: 0.302316 max: 0.526522
+Time = 1.2s
+
+smoothSolver:  Solving for Ux, Initial residual = 0.011231, Final residual = 5.9493e-06, No Iterations 2
+smoothSolver:  Solving for Uy, Initial residual = 0.0604606, Final residual = 3.14341e-06, No Iterations 3
+smoothSolver:  Solving for Uz, Initial residual = 0.0579052, Final residual = 2.78436e-06, No Iterations 3
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.68954e-05
+cudaPCG:  Solving for p, Initial residual = 0.138467, Final residual = 0.0114978, No Iterations 5
+time step continuity errors : sum local = 7.67135e-06, global = -1.29276e-19
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.68056e-05
+cudaPCG:  Solving for p, Initial residual = 0.0174194, Final residual = 9.29049e-07, No Iterations 171
+time step continuity errors : sum local = 6.3626e-10, global = -1.94202e-19, cumulative = -8.44285e-19
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.67471e-05
+ExecutionTime = 1.34366 s  ClockTime = 5 s
+
+Courant Number mean: 0.30235 max: 0.522073
+Time = 1.4s
+
+smoothSolver:  Solving for Ux, Initial residual = 0.0112622, Final residual = 5.9906e-06, No Iterations 2
+smoothSolver:  Solving for Uy, Initial residual = 0.0604226, Final residual = 3.02575e-06, No Iterations 3
+smoothSolver:  Solving for Uz, Initial residual = 0.0579576, Final residual = 2.8178e-06, No Iterations 3
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.69256e-05
+cudaPCG:  Solving for p, Initial residual = 0.139996, Final residual = 0.0110708, No Iterations 5
+time step continuity errors : sum local = 7.72116e-06, global = -1.39864e-19
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.6844e-05
+cudaPCG:  Solving for p, Initial residual = 0.0171316, Final residual = 9.22432e-07, No Iterations 168
+time step continuity errors : sum local = 6.56481e-10, global = -9.92438e-20, cumulative = -9.43529e-19
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.67855e-05
+ExecutionTime = 1.44163 s  ClockTime = 5 s
+
+Courant Number mean: 0.302378 max: 0.513552
+Time = 1.6s
+
+smoothSolver:  Solving for Ux, Initial residual = 0.0112887, Final residual = 6.0473e-06, No Iterations 2
+smoothSolver:  Solving for Uy, Initial residual = 0.0604487, Final residual = 2.93223e-06, No Iterations 3
+smoothSolver:  Solving for Uz, Initial residual = 0.0579816, Final residual = 2.85376e-06, No Iterations 3
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.69523e-05
+cudaPCG:  Solving for p, Initial residual = 0.139764, Final residual = 0.0108175, No Iterations 5
+time step continuity errors : sum local = 7.83894e-06, global = -9.09576e-20
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.6882e-05
+cudaPCG:  Solving for p, Initial residual = 0.0167755, Final residual = 9.54961e-07, No Iterations 169
+time step continuity errors : sum local = 7.05503e-10, global = -7.27243e-20, cumulative = -1.01625e-18
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.68234e-05
+ExecutionTime = 1.54471 s  ClockTime = 5 s
+
+Courant Number mean: 0.302397 max: 0.525839
+Time = 1.8s
+
+smoothSolver:  Solving for Ux, Initial residual = 0.011319, Final residual = 6.11587e-06, No Iterations 2
+smoothSolver:  Solving for Uy, Initial residual = 0.0604333, Final residual = 2.85465e-06, No Iterations 3
+smoothSolver:  Solving for Uz, Initial residual = 0.0580129, Final residual = 2.86622e-06, No Iterations 3
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.69763e-05
+cudaPCG:  Solving for p, Initial residual = 0.141885, Final residual = 0.0141122, No Iterations 4
+time step continuity errors : sum local = 1.05925e-05, global = -1.80854e-19
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.69196e-05
+cudaPCG:  Solving for p, Initial residual = 0.0193462, Final residual = 9.41155e-07, No Iterations 169
+time step continuity errors : sum local = 7.19104e-10, global = -6.82814e-20, cumulative = -1.08453e-18
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.68618e-05
+ExecutionTime = 1.64626 s  ClockTime = 5 s
+
+Courant Number mean: 0.302414 max: 0.531313
+Time = 2s
+
+smoothSolver:  Solving for Ux, Initial residual = 0.0113509, Final residual = 6.15584e-06, No Iterations 2
+smoothSolver:  Solving for Uy, Initial residual = 0.0604065, Final residual = 2.80992e-06, No Iterations 3
+smoothSolver:  Solving for Uz, Initial residual = 0.0580514, Final residual = 2.86187e-06, No Iterations 3
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.69997e-05
+cudaPCG:  Solving for p, Initial residual = 0.141057, Final residual = 0.0137031, No Iterations 4
+time step continuity errors : sum local = 1.06069e-05, global = -2.36957e-19
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.69558e-05
+cudaPCG:  Solving for p, Initial residual = 0.0190086, Final residual = 9.34766e-07, No Iterations 169
+time step continuity errors : sum local = 7.34695e-10, global = -2.00072e-19, cumulative = -1.28461e-18
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.68995e-05
+ExecutionTime = 1.7428 s  ClockTime = 5 s
+
+Courant Number mean: 0.302445 max: 0.528523
+Time = 2.2s
+
+smoothSolver:  Solving for Ux, Initial residual = 0.0113805, Final residual = 6.1756e-06, No Iterations 2
+smoothSolver:  Solving for Uy, Initial residual = 0.0603723, Final residual = 2.8385e-06, No Iterations 3
+smoothSolver:  Solving for Uz, Initial residual = 0.058091, Final residual = 2.87346e-06, No Iterations 3
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.70223e-05
+cudaPCG:  Solving for p, Initial residual = 0.142253, Final residual = 0.0136421, No Iterations 4
+time step continuity errors : sum local = 1.08134e-05, global = -1.88986e-21
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.69956e-05
+cudaPCG:  Solving for p, Initial residual = 0.0190144, Final residual = 8.59655e-07, No Iterations 169
+time step continuity errors : sum local = 6.88822e-10, global = -1.97345e-19, cumulative = -1.48195e-18
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.69374e-05
+ExecutionTime = 1.85044 s  ClockTime = 5 s
+
+Courant Number mean: 0.302476 max: 0.516321
+Time = 2.4s
+
+smoothSolver:  Solving for Ux, Initial residual = 0.0114076, Final residual = 6.20741e-06, No Iterations 2
+smoothSolver:  Solving for Uy, Initial residual = 0.0603617, Final residual = 2.90314e-06, No Iterations 3
+smoothSolver:  Solving for Uz, Initial residual = 0.0581307, Final residual = 2.88686e-06, No Iterations 3
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.70458e-05
+cudaPCG:  Solving for p, Initial residual = 0.141356, Final residual = 0.0131789, No Iterations 4
+time step continuity errors : sum local = 1.06322e-05, global = -1.0596e-19
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.70318e-05
+cudaPCG:  Solving for p, Initial residual = 0.0185965, Final residual = 9.84032e-07, No Iterations 169
+time step continuity errors : sum local = 8.00706e-10, global = -1.54555e-19, cumulative = -1.63651e-18
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.69753e-05
+ExecutionTime = 1.95206 s  ClockTime = 5 s
+
+Courant Number mean: 0.302496 max: 0.527986
+Time = 2.6s
+
+smoothSolver:  Solving for Ux, Initial residual = 0.0114362, Final residual = 6.24264e-06, No Iterations 2
+smoothSolver:  Solving for Uy, Initial residual = 0.0603745, Final residual = 2.9756e-06, No Iterations 3
+smoothSolver:  Solving for Uz, Initial residual = 0.058152, Final residual = 2.9005e-06, No Iterations 3
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.70701e-05
+cudaPCG:  Solving for p, Initial residual = 0.14178, Final residual = 0.0131974, No Iterations 4
+time step continuity errors : sum local = 1.08506e-05, global = -1.27519e-19
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.70731e-05
+cudaPCG:  Solving for p, Initial residual = 0.0185501, Final residual = 8.51024e-07, No Iterations 169
+time step continuity errors : sum local = 7.08527e-10, global = -1.61576e-19, cumulative = -1.79808e-18
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.70145e-05
+ExecutionTime = 2.05975 s  ClockTime = 5 s
+
+Courant Number mean: 0.302515 max: 0.534038
+Time = 2.8s
+
+smoothSolver:  Solving for Ux, Initial residual = 0.0114662, Final residual = 6.27507e-06, No Iterations 2
+smoothSolver:  Solving for Uy, Initial residual = 0.0603478, Final residual = 3.0786e-06, No Iterations 3
+smoothSolver:  Solving for Uz, Initial residual = 0.058154, Final residual = 2.92429e-06, No Iterations 3
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.70967e-05
+cudaPCG:  Solving for p, Initial residual = 0.143396, Final residual = 0.0133883, No Iterations 4
+time step continuity errors : sum local = 1.12066e-05, global = -1.07287e-19
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.7111e-05
+cudaPCG:  Solving for p, Initial residual = 0.0187336, Final residual = 9.51409e-07, No Iterations 169
+time step continuity errors : sum local = 8.02778e-10, global = -1.98805e-19, cumulative = -1.99689e-18
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.70546e-05
+ExecutionTime = 2.15924 s  ClockTime = 5 s
+
+Courant Number mean: 0.302542 max: 0.531775
+Time = 3s
+
+smoothSolver:  Solving for Ux, Initial residual = 0.011493, Final residual = 6.28124e-06, No Iterations 2
+smoothSolver:  Solving for Uy, Initial residual = 0.0603451, Final residual = 3.17449e-06, No Iterations 3
+smoothSolver:  Solving for Uz, Initial residual = 0.058166, Final residual = 2.94434e-06, No Iterations 3
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.71254e-05
+cudaPCG:  Solving for p, Initial residual = 0.143138, Final residual = 0.0131453, No Iterations 4
+time step continuity errors : sum local = 1.11433e-05, global = -2.42381e-19
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.71532e-05
+cudaPCG:  Solving for p, Initial residual = 0.0185151, Final residual = 9.85999e-07, No Iterations 169
+time step continuity errors : sum local = 8.40996e-10, global = -1.77163e-19, cumulative = -2.17405e-18
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.7095e-05
+ExecutionTime = 2.25641 s  ClockTime = 6 s
+
+Courant Number mean: 0.302571 max: 0.519993
+Time = 3.2s
+
+smoothSolver:  Solving for Ux, Initial residual = 0.0115158, Final residual = 6.2843e-06, No Iterations 2
+smoothSolver:  Solving for Uy, Initial residual = 0.060323, Final residual = 3.25335e-06, No Iterations 3
+smoothSolver:  Solving for Uz, Initial residual = 0.0582576, Final residual = 2.96001e-06, No Iterations 3
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.7156e-05
+cudaPCG:  Solving for p, Initial residual = 0.144169, Final residual = 0.013118, No Iterations 4
+time step continuity errors : sum local = 1.11995e-05, global = -1.48392e-19
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.71949e-05
+cudaPCG:  Solving for p, Initial residual = 0.0186381, Final residual = 8.41438e-07, No Iterations 169
+time step continuity errors : sum local = 7.20571e-10, global = -2.49713e-19, cumulative = -2.42376e-18
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.71364e-05
+ExecutionTime = 2.35624 s  ClockTime = 6 s
+
+Courant Number mean: 0.302593 max: 0.528687
+Time = 3.4s
+
+smoothSolver:  Solving for Ux, Initial residual = 0.0115441, Final residual = 6.27279e-06, No Iterations 2
+smoothSolver:  Solving for Uy, Initial residual = 0.0603243, Final residual = 3.30792e-06, No Iterations 3
+smoothSolver:  Solving for Uz, Initial residual = 0.0582973, Final residual = 2.97283e-06, No Iterations 3
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.71887e-05
+cudaPCG:  Solving for p, Initial residual = 0.141893, Final residual = 0.0129541, No Iterations 4
+time step continuity errors : sum local = 1.11408e-05, global = -1.3316e-19
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.72388e-05
+cudaPCG:  Solving for p, Initial residual = 0.0183158, Final residual = 9.51402e-07, No Iterations 169
+time step continuity errors : sum local = 8.23845e-10, global = -2.46532e-19, cumulative = -2.6703e-18
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.71799e-05
+ExecutionTime = 2.45328 s  ClockTime = 6 s
+
+Courant Number mean: 0.302619 max: 0.535349
+Time = 3.6s
+
+smoothSolver:  Solving for Ux, Initial residual = 0.0115708, Final residual = 6.2638e-06, No Iterations 2
+smoothSolver:  Solving for Uy, Initial residual = 0.060299, Final residual = 3.32619e-06, No Iterations 3
+smoothSolver:  Solving for Uz, Initial residual = 0.0582621, Final residual = 2.99208e-06, No Iterations 3
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.72229e-05
+cudaPCG:  Solving for p, Initial residual = 0.143901, Final residual = 0.0130392, No Iterations 4
+time step continuity errors : sum local = 1.13234e-05, global = -2.18288e-19
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.72829e-05
+cudaPCG:  Solving for p, Initial residual = 0.0184354, Final residual = 9.90695e-07, No Iterations 168
+time step continuity errors : sum local = 8.65488e-10, global = -2.31108e-19, cumulative = -2.9014e-18
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.72241e-05
+ExecutionTime = 2.55027 s  ClockTime = 6 s
+
+Courant Number mean: 0.302646 max: 0.533458
+Time = 3.8s
+
+smoothSolver:  Solving for Ux, Initial residual = 0.011598, Final residual = 6.26372e-06, No Iterations 2
+smoothSolver:  Solving for Uy, Initial residual = 0.0603315, Final residual = 3.31231e-06, No Iterations 3
+smoothSolver:  Solving for Uz, Initial residual = 0.0582735, Final residual = 2.99902e-06, No Iterations 3
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.72601e-05
+cudaPCG:  Solving for p, Initial residual = 0.145004, Final residual = 0.0131261, No Iterations 4
+time step continuity errors : sum local = 1.14988e-05, global = -2.61911e-19
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.73277e-05
+cudaPCG:  Solving for p, Initial residual = 0.0184068, Final residual = 9.53844e-07, No Iterations 167
+time step continuity errors : sum local = 8.40444e-10, global = -1.9268e-19, cumulative = -3.09408e-18
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.72701e-05
+ExecutionTime = 2.65135 s  ClockTime = 6 s
+
+Courant Number mean: 0.302669 max: 0.522094
+Time = 4s
+
+smoothSolver:  Solving for Ux, Initial residual = 0.0116214, Final residual = 6.2254e-06, No Iterations 2
+smoothSolver:  Solving for Uy, Initial residual = 0.0603437, Final residual = 3.27482e-06, No Iterations 3
+smoothSolver:  Solving for Uz, Initial residual = 0.0583505, Final residual = 2.98614e-06, No Iterations 3
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.73001e-05
+cudaPCG:  Solving for p, Initial residual = 0.145832, Final residual = 0.0127679, No Iterations 4
+time step continuity errors : sum local = 1.12474e-05, global = -2.20278e-19
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.73757e-05
+cudaPCG:  Solving for p, Initial residual = 0.0183784, Final residual = 8.88803e-07, No Iterations 169
+time step continuity errors : sum local = 7.8441e-10, global = -3.7634e-19, cumulative = -3.47042e-18
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.73167e-05
+ExecutionTime = 2.74805 s  ClockTime = 6 s
+
+Courant Number mean: 0.302691 max: 0.527946
+Time = 4.2s
+
+smoothSolver:  Solving for Ux, Initial residual = 0.0116485, Final residual = 6.14322e-06, No Iterations 2
+smoothSolver:  Solving for Uy, Initial residual = 0.0603116, Final residual = 3.20036e-06, No Iterations 3
+smoothSolver:  Solving for Uz, Initial residual = 0.058404, Final residual = 2.95411e-06, No Iterations 3
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.7343e-05
+cudaPCG:  Solving for p, Initial residual = 0.144986, Final residual = 0.0129807, No Iterations 4
+time step continuity errors : sum local = 1.14709e-05, global = -2.15507e-19
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.74258e-05
+cudaPCG:  Solving for p, Initial residual = 0.0184536, Final residual = 9.54109e-07, No Iterations 168
+time step continuity errors : sum local = 8.44861e-10, global = -1.21158e-19, cumulative = -3.59158e-18
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.73656e-05
+ExecutionTime = 2.84424 s  ClockTime = 6 s
+
+Courant Number mean: 0.302718 max: 0.535947
+Time = 4.4s
+
+smoothSolver:  Solving for Ux, Initial residual = 0.0116746, Final residual = 6.09036e-06, No Iterations 2
+smoothSolver:  Solving for Uy, Initial residual = 0.0602861, Final residual = 3.10776e-06, No Iterations 3
+smoothSolver:  Solving for Uz, Initial residual = 0.058384, Final residual = 2.92927e-06, No Iterations 3
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.73899e-05
+cudaPCG:  Solving for p, Initial residual = 0.14525, Final residual = 0.0129752, No Iterations 4
+time step continuity errors : sum local = 1.15191e-05, global = -3.68489e-19
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.74755e-05
+cudaPCG:  Solving for p, Initial residual = 0.0183377, Final residual = 9.13969e-07, No Iterations 168
+time step continuity errors : sum local = 8.14907e-10, global = -3.18514e-19, cumulative = -3.9101e-18
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.74157e-05
+ExecutionTime = 2.94108 s  ClockTime = 6 s
+
+Courant Number mean: 0.302743 max: 0.534061
+Time = 4.6s
+
+smoothSolver:  Solving for Ux, Initial residual = 0.0116995, Final residual = 6.03492e-06, No Iterations 2
+smoothSolver:  Solving for Uy, Initial residual = 0.06036, Final residual = 2.98968e-06, No Iterations 3
+smoothSolver:  Solving for Uz, Initial residual = 0.0583897, Final residual = 2.89516e-06, No Iterations 3
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.7442e-05
+cudaPCG:  Solving for p, Initial residual = 0.145018, Final residual = 0.013016, No Iterations 4
+time step continuity errors : sum local = 1.16298e-05, global = -2.40405e-19
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.75273e-05
+cudaPCG:  Solving for p, Initial residual = 0.0183898, Final residual = 8.52353e-07, No Iterations 169
+time step continuity errors : sum local = 7.64742e-10, global = -3.2571e-19, cumulative = -4.23581e-18
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.74682e-05
+ExecutionTime = 3.04344 s  ClockTime = 6 s
+
+Courant Number mean: 0.302765 max: 0.531308
+Time = 4.8s
+
+smoothSolver:  Solving for Ux, Initial residual = 0.0117247, Final residual = 5.94804e-06, No Iterations 2
+smoothSolver:  Solving for Uy, Initial residual = 0.0603568, Final residual = 2.88586e-06, No Iterations 3
+smoothSolver:  Solving for Uz, Initial residual = 0.0584467, Final residual = 2.84452e-06, No Iterations 3
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.74988e-05
+cudaPCG:  Solving for p, Initial residual = 0.145526, Final residual = 0.0129012, No Iterations 4
+time step continuity errors : sum local = 1.15838e-05, global = -2.96378e-19
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.75796e-05
+cudaPCG:  Solving for p, Initial residual = 0.0182601, Final residual = 8.78346e-07, No Iterations 170
+time step continuity errors : sum local = 7.90465e-10, global = -3.41238e-19, cumulative = -4.57704e-18
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.75215e-05
+ExecutionTime = 3.14475 s  ClockTime = 6 s
+
+Courant Number mean: 0.302791 max: 0.530441
+Time = 5s
+
+smoothSolver:  Solving for Ux, Initial residual = 0.0117531, Final residual = 5.86664e-06, No Iterations 2
+smoothSolver:  Solving for Uy, Initial residual = 0.0603227, Final residual = 2.79931e-06, No Iterations 3
+smoothSolver:  Solving for Uz, Initial residual = 0.0584806, Final residual = 2.79172e-06, No Iterations 3
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.75595e-05
+cudaPCG:  Solving for p, Initial residual = 0.145466, Final residual = 0.0127839, No Iterations 4
+time step continuity errors : sum local = 1.1522e-05, global = -2.59444e-19
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.76368e-05
+cudaPCG:  Solving for p, Initial residual = 0.0182354, Final residual = 9.86167e-07, No Iterations 168
+time step continuity errors : sum local = 8.90999e-10, global = -3.26528e-19, cumulative = -4.90357e-18
+Pressure gradient source: uncorrected Ubar = 0.1335, pressure gradient = 2.75765e-05
+ExecutionTime = 3.60423 s  ClockTime = 7 s
+
+End
+

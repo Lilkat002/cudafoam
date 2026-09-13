@@ -1,9 +1,13 @@
 #include "cudaPCG.H"
+#include "PCG.H"
+#include "cyclicLduInterface.H"
 
 extern "C" void cudaPCG_solve(
     int nCells, int nFaces,
     const double* diag, const double* upper, const double* lower,
     const int* upperAddr, const int* lowerAddr,
+    int nExtra, const int* extraRow, const int* extraCol,
+    const double* extraVal,
     const double* source,
     double* psi,
     double tolerance, double relTol,
@@ -54,27 +58,91 @@ Foam::solverPerformance Foam::cudaPCG::solve
     label nCells = psi.size();
     label nFaces = matrix_.upper().size();
 
-    bool hasCoupled = false;
+    // Coupled interfaces. Plain cyclic (periodic) coupling is folded into
+    // the GPU matrix as extra off-diagonal entries — on a single rank both
+    // sides of a cyclic patch are local cells, so in lduMatrix::Amul terms
+    // the interface update result[fc] -= bouCoeffs[f]*psi[nbrFc] is just a
+    // matrix entry A(fc, nbrFc) = -bouCoeffs[f]. Anything that is not a
+    // one-to-one local coupling (processor boundaries, non-conformal/AMI)
+    // falls back to OpenFOAM's own PCG so the answer is always correct.
+    List<int> extraRow, extraCol;
+    List<double> extraVal;
+    bool fallback = false;
+
     forAll(interfaces_, i)
     {
-        if (interfaces_.set(i))
+        if (!interfaces_.set(i)) continue;
+
+        const lduInterface& intf = interfaces_[i].interface();
+
+        if (!isA<cyclicLduInterface>(intf))
         {
-            hasCoupled = true;
+            fallback = true;
             break;
         }
+
+        const cyclicLduInterface& cyc =
+            refCast<const cyclicLduInterface>(intf);
+
+        const labelUList& fc = matrix_.lduAddr().patchAddr(i);
+        const labelUList& nbrFc =
+            matrix_.lduAddr().patchAddr(cyc.nbrPatchIndex());
+        const scalarField& bou = interfaceBouCoeffs_[i];
+
+        if (nbrFc.size() != fc.size())
+        {
+            fallback = true;
+            break;
+        }
+
+        label base = extraRow.size();
+        extraRow.setSize(base + fc.size());
+        extraCol.setSize(base + fc.size());
+        extraVal.setSize(base + fc.size());
+
+        forAll(fc, f)
+        {
+            if (fc[f] == nbrFc[f])
+            {
+                // degenerate self-coupling (single-cell-thick periodic
+                // direction) — leave it to the CPU solver
+                fallback = true;
+                break;
+            }
+            extraRow[base + f] = fc[f];
+            extraCol[base + f] = nbrFc[f];
+            extraVal[base + f] = -bou[f];
+        }
+        if (fallback) break;
     }
-    if (hasCoupled)
+
+    if (fallback)
     {
         static bool warned = false;
         if (!warned)
         {
             warned = true;
             WarningInFunction
-                << "cudaPCG does not apply coupled (processor/cyclic) "
-                   "boundary contributions on the GPU. Use it only for "
-                   "single-rank runs without cyclic patches; results "
-                   "otherwise will not match the CPU solver." << endl;
+                << "cudaPCG: non-cyclic coupled interfaces present "
+                   "(processor/non-conformal); solving on the CPU with PCG "
+                   "instead." << endl;
         }
+
+        dictionary controls(controlDict_);
+        if (!controls.found("preconditioner"))
+        {
+            controls.add("preconditioner", word("DIC"));
+        }
+
+        return PCG
+        (
+            fieldName_,
+            matrix_,
+            interfaceBouCoeffs_,
+            interfaceIntCoeffs_,
+            interfaces_,
+            controls
+        ).solve(psi, source, cmpt);
     }
 
     int nIterations = 0;
@@ -89,6 +157,10 @@ Foam::solverPerformance Foam::cudaPCG::solve
         matrix_.lower().begin(),
         matrix_.lduAddr().upperAddr().begin(),
         matrix_.lduAddr().lowerAddr().begin(),
+        extraRow.size(),
+        extraRow.begin(),
+        extraCol.begin(),
+        extraVal.begin(),
         source.begin(),
         psi.begin(),
         tolerance_, relTol_,

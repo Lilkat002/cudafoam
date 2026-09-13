@@ -107,9 +107,16 @@ Everything else about the case is unchanged.
 - **Symmetric matrices only** (it registers as a symmetric-matrix solver) —
   i.e. pressure/Laplacian-type equations. That is where the solver time goes
   in incompressible CFD, so this is the case that matters.
-- **Single rank, single GPU.** Coupled interfaces (processor boundaries from
-  `decomposePar`, cyclic patches) are not applied on the GPU; the solver
-  warns once if any are present. MPI support is the natural next step.
+- **Cyclic (periodic) boundaries are fully supported on the GPU**: their
+  coupling is folded into the sparse matrix as extra off-diagonal entries
+  (validated on the periodic `channel395` tutorial — the first solve's
+  initial residual matches CPU PCG exactly, and final fields agree within
+  the same scatter as GAMG-vs-PCG).
+- **Single rank, single GPU.** On decomposed runs (`decomposePar`) or with
+  non-conformal couplings, the solver detects the interfaces it cannot
+  apply and automatically falls back to OpenFOAM's own PCG — results are
+  always correct, there is just no GPU speedup. MPI support is the natural
+  next step.
 - Solves at tiny mesh sizes (≲10k cells) are launch-latency bound; the GPU
   advantage grows with mesh size.
 
