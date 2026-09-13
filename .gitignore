@@ -1,0 +1,11 @@
+# wmake build artifacts
+cudaPCG/Make/linux*/
+cudaPCG/lnInclude/
+*.o
+*.so
+
+# Claude Code local settings
+.claude/
+
+# macOS
+.DS_Store

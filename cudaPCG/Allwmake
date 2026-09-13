@@ -1,0 +1,15 @@
+#!/bin/sh
+cd "${0%/*}" || exit 1
+
+# GPU architecture for AWS g5.* instances (A10G, Ampere, sm_86).
+# Override with: ARCH=sm_XX ./Allwmake
+ARCH="${ARCH:-sm_86}"
+
+mkdir -p "$FOAM_USER_LIBBIN"
+
+set -e
+echo "Compiling CUDA kernels ($ARCH) -> $FOAM_USER_LIBBIN/cudaKernels.o"
+nvcc -std=c++17 -O3 -arch=$ARCH --compiler-options -fPIC \
+    -c cudaKernels.cu -o "$FOAM_USER_LIBBIN/cudaKernels.o"
+
+wmake libso .

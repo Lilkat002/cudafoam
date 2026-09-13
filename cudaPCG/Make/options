@@ -1,0 +1,13 @@
+EXE_INC = \
+    -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -I/usr/local/cuda/include
+
+# cudaKernels.o is pre-built from cudaKernels.cu by nvcc (see Allwmake) —
+# wmake doesn't know how to compile .cu files, so we hand it a prebuilt
+# object and just link it in.
+LIB_LIBS = \
+    -lfiniteVolume \
+    $(FOAM_USER_LIBBIN)/cudaKernels.o \
+    -L/usr/local/cuda/lib64 \
+    -lcudart \
+    -lcusparse
