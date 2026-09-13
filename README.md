@@ -60,8 +60,9 @@ it is selected from `fvSolution` like any built-in solver. Internally:
 
 ## Requirements
 
-- OpenFOAM 12 (openfoam.org packaging; other versions likely need minor
-  adjustments to the solver-table registration)
+- OpenFOAM 12 (openfoam.org). The ESI fork also builds (compile-verified on
+  v2412) via an `#if OPENFOAM` guard around the one API difference; note
+  that on ESI, AMI couplings always take the CPU fallback.
 - CUDA toolkit 12.x or 13.x with cuSPARSE
 - An NVIDIA GPU (default build targets `sm_86` — Ampere; override with
   `ARCH=sm_XX ./Allwmake`)

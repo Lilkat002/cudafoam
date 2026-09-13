@@ -86,7 +86,16 @@ Foam::solverPerformance Foam::cudaPCG::solve
 
         const labelUList& fc = matrix_.lduAddr().patchAddr(i);
         const labelUList& nbrFc =
+#if OPENFOAM >= 1000
+            // ESI fork (e.g. v2412). ESI's cyclicAMILduInterface is a
+            // standalone class, not derived from cyclicLduInterface, so
+            // AMI/non-conformal couplings fail the isA<> test above and
+            // take the CPU fallback — as they should.
+            matrix_.lduAddr().patchAddr(cyc.neighbPatchID());
+#else
+            // Foundation fork (OpenFOAM 12)
             matrix_.lduAddr().patchAddr(cyc.nbrPatchIndex());
+#endif
         const scalarField& bou = interfaceBouCoeffs_[i];
 
         if (nbrFc.size() != fc.size())
