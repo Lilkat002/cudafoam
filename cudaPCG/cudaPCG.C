@@ -1,6 +1,9 @@
 #include "cudaPCG.H"
 #include "PCG.H"
 #include "cyclicLduInterface.H"
+#include "processorLduInterface.H"
+
+#include <cstdlib>
 
 extern "C" void cudaPCG_solve(
     int nCells, int nFaces,
@@ -86,7 +89,7 @@ Foam::solverPerformance Foam::cudaPCG::solve
 
         const labelUList& fc = matrix_.lduAddr().patchAddr(i);
         const labelUList& nbrFc =
-#if OPENFOAM >= 1000
+#if defined(OPENFOAM) && OPENFOAM >= 1000
             // ESI fork (e.g. v2412). ESI's cyclicAMILduInterface is a
             // standalone class, not derived from cyclicLduInterface, so
             // AMI/non-conformal couplings fail the isA<> test above and
@@ -125,6 +128,8 @@ Foam::solverPerformance Foam::cudaPCG::solve
         if (fallback) break;
     }
 
+    static const bool verbose = std::getenv("CUDAPCG_VERBOSE") != nullptr;
+
     if (fallback)
     {
         static bool warned = false;
@@ -132,9 +137,28 @@ Foam::solverPerformance Foam::cudaPCG::solve
         {
             warned = true;
             WarningInFunction
-                << "cudaPCG: non-cyclic coupled interfaces present "
-                   "(processor/non-conformal); solving on the CPU with PCG "
-                   "instead." << endl;
+                << "cudaPCG: coupled interfaces present that cannot be "
+                   "applied on the GPU; solving on the CPU with PCG instead. "
+                   "The coupled interfaces are:" << endl;
+            forAll(interfaces_, i)
+            {
+                if (!interfaces_.set(i)) continue;
+                const lduInterface& intf = interfaces_[i].interface();
+                const char* what =
+                    isA<processorLduInterface>(intf)
+                  ? "processor (MPI decomposition)"
+                  : isA<cyclicLduInterface>(intf)
+                  ? "cyclic (face-count mismatch or self-coupling)"
+                  : "non-conformal/AMI or other coupled type";
+                Info<< "    interface " << i << ": " << what << ", "
+                    << matrix_.lduAddr().patchAddr(i).size()
+                    << " faces" << endl;
+            }
+        }
+        if (verbose)
+        {
+            Info<< "cudaPCG: [" << fieldName_
+                << "] CPU fallback (PCG)" << endl;
         }
 
         dictionary controls(controlDict_);
@@ -152,6 +176,12 @@ Foam::solverPerformance Foam::cudaPCG::solve
             interfaces_,
             controls
         ).solve(psi, source, cmpt);
+    }
+
+    if (verbose)
+    {
+        Info<< "cudaPCG: [" << fieldName_ << "] GPU path, "
+            << extraRow.size() << " cyclic couplings" << endl;
     }
 
     int nIterations = 0;

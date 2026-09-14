@@ -15,16 +15,21 @@ Native NVIDIA GPU acceleration for OpenFOAM's pressure solver — a drop-in
 **[Roadmap](#roadmap)**
 
 On a single A10G (AWS g5.xlarge), the GPU solver is faster than **every** CPU
-option in stock OpenFOAM 12, including GAMG, at identical tolerances:
+option in stock OpenFOAM 12 at identical tolerances — including GAMG, the
+baseline that actually matters:
 
-| Mesh (pitzDaily, incompressible) | CPU PCG-DIC | CPU GAMG | **cudaPCG (GPU)** |
+| Mesh (pitzDaily, incompressible) | CPU GAMG | CPU PCG-DIC | **cudaPCG (GPU)** |
 |---|---|---|---|
-| 12,225 cells, 1000 steps | 93.1 s | — | **65.1 s** |
-| 305,625 cells, 5 steps | 56.0 s | 17.2 s | **13.3 s** |
-| 1,222,500 cells, 5 steps | 498 s | 95.0 s | **88.3 s** |
+| 12,225 cells, 1000 steps | — | 93.1 s | **65.1 s** |
+| 305,625 cells, 5 steps | 17.2 s | 56.0 s | **13.3 s** |
+| 1,222,500 cells, 5 steps | 95.0 s | 498 s | **88.3 s** |
 
-That is **5.6×** over the equivalent CPU solver (PCG-DIC) at 1.2M cells, and
-still ahead of GAMG — the strongest CPU baseline. Accuracy is validated on
+Against GAMG — the multigrid solver production cases actually run — the GPU
+is **1.3×** faster at 306k cells and **1.08×** at 1.2M; a GPU multigrid
+(see Roadmap) is what would widen that gap, since today the hardware
+advantage is partly spent cancelling PCG's algorithmic disadvantage.
+Against the equivalent algorithm on CPU (PCG-DIC) the GPU is **5.6×** at
+1.2M cells. Accuracy is validated on
 every run: pressure fields match the CPU reference to 0.017–0.06 % of the
 field range on the small/medium meshes; at 1.2M cells the GPU–CPU difference
 (0.56 %) is the same magnitude as the GAMG–PCG difference (0.46 %), i.e.
